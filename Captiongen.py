@@ -1,13 +1,3 @@
-import os
-
-# -------------------------------
-# Install PyTorch on Streamlit Cloud
-# -------------------------------
-os.system("pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu")
-
-# -------------------------------
-# Imports
-# -------------------------------
 import streamlit as st
 from PIL import Image
 import torch
@@ -23,7 +13,7 @@ st.title("🖼️ AI Image Caption Generator")
 st.write("Generate captions from an image via URL or by uploading a local file.")
 
 # -------------------------------
-# Load model (cached)
+# Load BLIP model (cached)
 # -------------------------------
 @st.cache_resource(show_spinner=True)
 def load_model():
