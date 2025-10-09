@@ -1,4 +1,4 @@
-import streamlit as st
+import gradio as gr
 from PIL import Image
 import torch
 from transformers import BlipProcessor, BlipForConditionalGeneration
@@ -6,57 +6,54 @@ import requests
 from io import BytesIO
 
 # -------------------------------
-# Streamlit page setup
+# Load BLIP model (once)
 # -------------------------------
-st.set_page_config(page_title="AI Image Caption Generator", page_icon="🖼️")
-st.title("🖼️ AI Image Caption Generator")
-st.write("Generate captions from an image via URL or by uploading a local file.")
+processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
+model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
+device = torch.device("cpu")
+model.to(device)
 
 # -------------------------------
-# Load BLIP model (cached)
+# Caption generation function
 # -------------------------------
-@st.cache_resource(show_spinner=True)
-def load_model():
-    processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
-    model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
-    device = torch.device("cpu")
-    model.to(device)
-    return processor, model, device
-
-processor, model, device = load_model()
-
-# -------------------------------
-# Image input section
-# -------------------------------
-input_choice = st.radio("Choose input type:", ("URL", "Local File"))
-image = None
-
-if input_choice == "URL":
-    image_url = st.text_input("Paste the image URL here:")
-    if image_url:
+def generate_caption(input_image):
+    """
+    input_image: PIL.Image object or URL string
+    """
+    # Handle URL input
+    if isinstance(input_image, str):
         try:
-            response = requests.get(image_url)
+            response = requests.get(input_image)
             image = Image.open(BytesIO(response.content)).convert("RGB")
-            st.image(image, caption="Uploaded Image from URL", use_column_width=True)
         except Exception as e:
-            st.error(f"❌ Error loading image from URL: {e}")
-
-elif input_choice == "Local File":
-    uploaded_file = st.file_uploader("Upload an image file", type=["jpg", "jpeg", "png", "bmp", "gif"])
-    if uploaded_file:
-        image = Image.open(uploaded_file).convert("RGB")
-        st.image(image, caption="Uploaded Local Image", use_column_width=True)
+            return f"❌ Error loading image from URL: {e}"
+    else:
+        image = input_image.convert("RGB")
+    
+    try:
+        inputs = processor(images=image, return_tensors="pt")
+        out = model.generate(**inputs)
+        caption = processor.decode(out[0], skip_special_tokens=True)
+        return caption
+    except Exception as e:
+        return f"❌ Error generating caption: {e}"
 
 # -------------------------------
-# Generate caption
+# Gradio Interface
 # -------------------------------
-if image is not None:
-    if st.button("Generate Caption"):
-        with st.spinner("Generating caption... Please wait ⏳"):
-            try:
-                inputs = processor(images=image, return_tensors="pt")
-                out = model.generate(**inputs)
-                caption = processor.decode(out[0], skip_special_tokens=True)
-                st.success(f"✅ Caption: {caption}")
-            except Exception as e:
-                st.error(f"❌ Error generating caption: {e}")
+iface = gr.Interface(
+    fn=generate_caption,
+    inputs=[
+        gr.Image(type="pil", label="Upload Image"),
+        gr.Textbox(label="Or paste Image URL (optional)")
+    ],
+    outputs=gr.Textbox(label="Generated Caption"),
+    title="🖼️ Captiongen - AI Image Caption Generator",
+    description="Upload an image or paste an image URL to generate a descriptive caption using the BLIP model.",
+    allow_flagging="never"
+)
+
+# -------------------------------
+# Launch app
+# -------------------------------
+iface.launch()
