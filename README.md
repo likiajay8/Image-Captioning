@@ -1,14 +1,11 @@
-Image-Captioning
-AI Image Caption Generator using  deep learning
+🖼️ Captiongen - AI Image Caption Generator
 
-
-Captiongen - AI Image Caption Generator
-
-Captiongen is a Streamlit app that generates captions for uploaded images using a deep learning model. Users can upload an image and get an automatic descriptive caption.
+Captiongen is an AI-powered tool that generates descriptive captions for images using Salesforce’s BLIP model. This version supports local image uploads only through a simple Gradio interface.
 
 Features
-- Upload images in JPG/PNG format
-- Generate descriptive captions for images
-- Simple and interactive Streamlit interface
 
+Upload an image from your computer
 
+Generate AI-powered descriptive captions
+
+Lightweight and easy to run on CPU or GPU
