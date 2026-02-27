@@ -74,10 +74,15 @@ python app.py
 Your requirements.txt is correct ✅
 
 gradio==3.43.0
+
 torch==2.1.0
+
 torchvision==0.16.0
+
 torchaudio==2.1.0
+
 transformers==4.35.0
+
 pillow<11.0,>=8.0
 
 
