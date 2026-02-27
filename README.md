@@ -3,6 +3,8 @@
 An AI-powered web app that generates descriptive captions for images using the BLIP (Bootstrapping Language-Image Pretraining) model from Salesforce.
 Built with Transformers, PyTorch, and Gradio for an interactive interface.
 
+Live working link - https://likiajay8-caption-generator.hf.space/?__theme=system&deep_link=5T6-bey3lp4
+
 
 🚀 Features
 
