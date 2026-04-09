@@ -42,7 +42,7 @@ iface = gr.Interface(
     outputs=gr.Textbox(label="Generated Caption"),
     title="🖼️ Captiongen - AI Image Caption Generator",
     description="Upload an image to generate a descriptive caption using the BLIP model.",
-    allow_flagging="never"
+    
 )
 
 # -------------------------------
